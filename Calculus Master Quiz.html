@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Master Quiz</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- MathJax Configuration and Script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            options: {
+                enableMenu: false
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        accent: {
+                            purple: '#a855f7',
+                            blue: '#3b82f6',
+                            green: '#10b981'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #020617;
+            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020617 70%);
+        }
+        
+        /* Custom scrollbar for better look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        /* Prevent MathJax overflow and contain math expressions cleanly */
+        mjx-container {
+            max-width: 100% !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            vertical-align: middle !important;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+
+        mjx-container[display="true"] {
+            display: block !important;
+            margin: 0.5em 0 !important;
+            text-align: center !important;
+        }
+
+        mjx-container svg {
+            max-width: 100% !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-200 flex items-center justify-center p-3 sm:p-6 font-sans antialiased selection:bg-purple-500/30">
+
+    <div id="app-container" class="max-w-3xl w-full glass-panel rounded-2xl shadow-2xl shadow-purple-900/20 overflow-hidden relative">
+        
+        <!-- Progress Bar -->
+        <div class="h-1.5 w-full bg-slate-800 absolute top-0 left-0">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500 ease-out" style="width: 0%"></div>
+        </div>
+
+        <div class="p-5 sm:p-8 md:p-10">
+            
+            <!-- Quiz Screen -->
+            <div id="quiz-screen" class="block">
+                <!-- Header -->
+                <div class="flex justify-between items-end mb-6 border-b border-slate-700/50 pb-4">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">Calculus Challenge</h1>
+                        <p class="text-slate-400 mt-1 text-xs sm:text-sm md:text-base">Master your derivatives</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span id="question-tracker" class="text-sm sm:text-base md:text-lg font-semibold text-purple-300">Question 1/7</span>
+                    </div>
+                </div>
+
+                <!-- Question Area -->
+                <div class="mb-6 min-h-[70px] flex items-center overflow-x-auto w-full">
+                    <h2 id="question-text" class="text-base sm:text-lg md:text-2xl font-medium leading-relaxed w-full">
+                        <!-- Question injected here -->
+                    </h2>
+                </div>
+
+                <!-- Options -->
+                <div id="options-container" class="space-y-3">
+                    <!-- Options injected here -->
+                </div>
+
+                <!-- Feedback & Explanation Area -->
+                <div id="feedback-container" class="mt-6 hidden animate-[fadeIn_0.3s_ease-out]">
+                    <div id="explanation-box" class="p-4 sm:p-5 rounded-xl border border-slate-700 bg-slate-800/60 text-slate-300 text-sm sm:text-base md:text-lg overflow-hidden w-full">
+                        <div class="flex items-center gap-3 mb-3 font-semibold" id="feedback-title">
+                            <!-- Correct/Wrong indicator injected here -->
+                        </div>
+                        <div id="explanation-text" class="leading-relaxed overflow-x-auto max-w-full break-words py-1">
+                            <!-- Explanation injected here -->
+                        </div>
+                    </div>
+                    
+                    <button id="next-btn" onclick="nextQuestion()" class="mt-5 w-full py-3.5 sm:py-4 rounded-xl font-bold text-base sm:text-lg text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-600/20 transform hover:-translate-y-0.5 transition-all">
+                        Next Question &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="results-screen" class="hidden text-center py-10">
+                <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-tr from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-purple-500/30">
+                    <svg class="w-10 h-10 sm:w-12 sm:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-bold text-white mb-4">Quiz Completed!</h1>
+                <p class="text-lg sm:text-xl text-slate-400 mb-8">You answered <span id="final-score" class="font-bold text-purple-400">0</span> out of <span id="total-questions" class="font-bold">7</span> correctly.</p>
+                
+                <div class="flex justify-center gap-4">
+                    <button onclick="retakeQuiz()" class="px-8 py-3 rounded-xl font-bold text-base sm:text-lg text-white bg-slate-700 hover:bg-slate-600 border border-slate-600 transition-all shadow-lg">
+                        Retake Quiz
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Quiz Data with updated display equations for optimal mobile rendering
+        const quizData = [
+            {
+                question: "Find \\( \\frac{dy}{dx} \\) for \\( y = x^5 + 9 \\).",
+                options: [
+                    "\\( 5x^4 \\)",
+                    "\\( 5x^5 \\)",
+                    "\\( x^4 + 9 \\)",
+                    "\\( 4x^5 \\)"
+                ],
+                correct: 0,
+                explanation: "The derivative of a constant (9) is 0. Using the power rule on \\( x^5 \\), we drop the exponent to the front and subtract 1 from the power, resulting in \\( 5x^4 \\)."
+            },
+            {
+                question: "Find \\( \\frac{dy}{dx} \\) for \\( y = 4x^2 - 5x + 7 \\).",
+                options: [
+                    "\\( 8x - 5 \\)",
+                    "\\( 4x - 5 \\)",
+                    "\\( 8x + 7 \\)",
+                    "\\( 8x^2 - 5 \\)"
+                ],
+                correct: 0,
+                explanation: "Applying the power rule to each term individually:<br>• \\( \\frac{d}{dx}(4x^2) = 8x \\)<br>• \\( \\frac{d}{dx}(-5x) = -5 \\)<br>• \\( \\frac{d}{dx}(7) = 0 \\)<br>Thus, \\( 8x - 5 \\)."
+            },
+            {
+                question: "Find \\( \\frac{dy}{dx} \\) for \\( y = \\frac{1}{x^3} \\).",
+                options: [
+                    "\\( -\\frac{3}{x^4} \\)",
+                    "\\( \\frac{3}{x^2} \\)",
+                    "\\( -\\frac{1}{3x^2} \\)",
+                    "\\( -\\frac{3}{x^3} \\)"
+                ],
+                correct: 0,
+                explanation: "First, rewrite with a negative exponent: \\( y = x^{-3} \\).<br>Applying power rule: \\( -3x^{-4} \\).<br>Converting back to a positive exponent: \\( -\\frac{3}{x^4} \\)."
+            },
+            {
+                question: "If \\( y = (x^3 + 2)^7 \\) find \\( \\frac{dx}{dy} \\).",
+                options: [
+                    "\\( \\frac{x^3 + 2}{21x^2 y} \\)",
+                    "\\( \\frac{21x^2 y}{x^3 + 2} \\)",
+                    "\\( \\frac{x^3 + 2}{7x^2 y} \\)",
+                    "\\( \\frac{3x^2}{21y} \\)"
+                ],
+                correct: 0,
+                explanation: "By chain rule:<br>\\[ \\frac{dy}{dx} = 7(x^3+2)^6(3x^2) = 21x^2(x^3+2)^6 \\]<br>Multiply numerator and denominator by \\( (x^3+2) \\) to get \\( \\frac{21x^2y}{x^3+2} \\).<br>To find \\( \\frac{dx}{dy} \\), we invert it: \\[ \\frac{dx}{dy} = \\frac{x^3 + 2}{21x^2 y} \\]"
+            },
+            {
+                question: "If \\( y = \\sin(3x - 2) \\) find \\( y'' \\).",
+                options: [
+                    "\\( -9\\sin(3x - 2) \\)",
+                    "\\( 9\\cos(3x - 2) \\)",
+                    "\\( -3\\sin(3x - 2) \\)",
+                    "\\( -9\\cos(3x - 2) \\)"
+                ],
+                correct: 0,
+                explanation: "First derivative (Chain Rule):<br>\\[ y' = 3\\cos(3x-2) \\]<br>Second derivative:<br>\\[ y'' = -9\\sin(3x-2) \\]"
+            },
+            {
+                question: "If \\( y = 2\\sin x - x\\cos x \\) find \\( \\frac{d^2y}{dx^2} + y \\).",
+                options: [
+                    "\\( 2\\sin x \\)",
+                    "\\( x\\cos x \\)",
+                    "\\( 0 \\)",
+                    "\\( 2\\cos x \\)"
+                ],
+                correct: 0,
+                explanation: "First derivative:<br>\\[ y' = 2\\cos x - (\\cos x - x\\sin x) = \\cos x + x\\sin x \\]<br>Second derivative:<br>\\[ y'' = -\\sin x + (\\sin x + x\\cos x) = x\\cos x \\]<br>Finally:<br>\\[ y'' + y = x\\cos x + (2\\sin x - x\\cos x) = 2\\sin x \\]"
+            },
+            {
+                question: "If \\( y = x\\tan x \\) find \\( \\frac{d^2y}{dx^2} \\) at \\( x = \\frac{\\pi}{4} \\).",
+                options: [
+                    "\\( 4 + \\pi \\)",
+                    "\\( 2 + \\pi \\)",
+                    "\\( 4 + \\frac{\\pi}{2} \\)",
+                    "\\( 2\\pi \\)"
+                ],
+                correct: 0,
+                explanation: "First derivative (Product Rule):<br>\\[ y' = \\tan x + x\\sec^2 x \\]<br>Second derivative:<br>\\[ y'' = 2\\sec^2 x + 2x\\sec^2 x \\tan x \\]<br>At \\( x = \\frac{\\pi}{4} \\):<br>\\[ 2(2) + 2\\left(\\frac{\\pi}{4}\\right)(2)(1) = 4 + \\pi \\]"
+            }
+        ];
+
+        // State Variables
+        let currentQuestion = 0;
+        let score = 0;
+        let hasAnswered = false;
+        let currentShuffledOptions = [];
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const explanationText = document.getElementById('explanation-text');
+        const progressBar = document.getElementById('progress-bar');
+        const questionTracker = document.getElementById('question-tracker');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+
+        function loadQuestion() {
+            hasAnswered = false;
+            const q = quizData[currentQuestion];
+            
+            // Update Progress
+            const progress = ((currentQuestion) / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            questionTracker.innerText = `Question ${currentQuestion + 1}/${quizData.length}`;
+
+            // Inject Question
+            questionText.innerHTML = q.question;
+            
+            // Shuffle Options (Fisher-Yates Algorithm)
+            currentShuffledOptions = q.options.map((opt, index) => ({
+                text: opt,
+                isCorrect: index === q.correct
+            }));
+            
+            for (let i = currentShuffledOptions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentShuffledOptions[i], currentShuffledOptions[j]] = [currentShuffledOptions[j], currentShuffledOptions[i]];
+            }
+            
+            // Inject Options
+            optionsContainer.innerHTML = '';
+            currentShuffledOptions.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-3.5 sm:p-4 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 hover:border-purple-500 text-sm sm:text-base md:text-lg flex items-center group overflow-hidden';
+                btn.innerHTML = `
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-900 border border-slate-600 flex items-center justify-center mr-3 sm:mr-4 group-hover:border-purple-500 group-hover:text-purple-400 transition-colors font-bold text-xs sm:text-sm shrink-0">
+                        ${String.fromCharCode(65 + index)}
+                    </div>
+                    <div class="flex-1 overflow-x-auto py-0.5">${opt.text}</div>
+                `;
+                btn.onclick = () => selectOption(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Hide feedback area
+            feedbackContainer.classList.add('hidden');
+
+            // Re-render MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise([document.getElementById('app-container')]).catch((err) => console.log(err.message));
+            }
+        }
+
+        function selectOption(selectedIndex, selectedBtn) {
+            if (hasAnswered) return;
+            hasAnswered = true;
+
+            const q = quizData[currentQuestion];
+            const isCorrect = currentShuffledOptions[selectedIndex].isCorrect;
+            
+            if (isCorrect) score++;
+
+            // Style buttons based on answer
+            const buttons = optionsContainer.children;
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                buttons[i].classList.remove('hover:bg-slate-700', 'hover:border-purple-500');
+                
+                const letterBox = buttons[i].querySelector('div:first-child');
+
+                if (currentShuffledOptions[i].isCorrect) {
+                    buttons[i].classList.add('bg-green-900/40', 'border-green-500');
+                    letterBox.classList.add('bg-green-600', 'border-green-500', 'text-white');
+                    letterBox.classList.remove('bg-slate-900', 'border-slate-600');
+                } else if (i === selectedIndex && !isCorrect) {
+                    buttons[i].classList.add('bg-red-900/40', 'border-red-500');
+                    letterBox.classList.add('bg-red-600', 'border-red-500', 'text-white');
+                    letterBox.classList.remove('bg-slate-900', 'border-slate-600');
+                } else {
+                    buttons[i].classList.add('opacity-50');
+                }
+            }
+
+            // Show Feedback
+            if (isCorrect) {
+                feedbackTitle.innerHTML = `
+                    <svg class="w-6 h-6 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span class="text-green-400">Correct!</span>
+                `;
+                feedbackTitle.parentElement.classList.add('border-green-500/30');
+                feedbackTitle.parentElement.classList.remove('border-red-500/30', 'border-slate-700');
+            } else {
+                feedbackTitle.innerHTML = `
+                    <svg class="w-6 h-6 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span class="text-red-400">Incorrect</span>
+                `;
+                feedbackTitle.parentElement.classList.add('border-red-500/30');
+                feedbackTitle.parentElement.classList.remove('border-green-500/30', 'border-slate-700');
+            }
+
+            explanationText.innerHTML = q.explanation;
+            feedbackContainer.classList.remove('hidden');
+
+            // Render MathJax in explanation
+            if (window.MathJax) {
+                MathJax.typesetPromise([explanationText]).catch((err) => console.log(err.message));
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('total-questions').innerText = quizData.length;
+            progressBar.style.width = '100%';
+        }
+
+        function retakeQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            quizScreen.classList.remove('hidden');
+            resultsScreen.classList.add('hidden');
+            loadQuestion();
+        }
+
+        // Start Quiz on load
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
